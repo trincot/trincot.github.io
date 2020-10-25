@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <style>
+    textarea { border: none; white-space: pre; min-width: 50% }    
+  </style>
+</head>
+<body>
+
+<script src="https://cdn.jsdelivr.net/gh/trincot/lmc@v0.76/lmc.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    let lmc = new LmcGui(document.body);
+    let codeArea = lmc.gui.code;
+    let editArea = document.createElement("textarea");
+    editArea.textContent = "        HLT";
+    let btnLoad = document.createElement("button");    
+    btnLoad.textContent = "Edit";
+    lmc.gui.reload.insertAdjacentElement("afterend", btnLoad);
+    btnLoad.addEventListener("click", function () {
+        if (!editArea.parentNode) {
+            lmc.load(); // stop execution
+            codeArea.replaceWith(editArea);
+            editArea.focus();
+            btnLoad.textContent = "Assemble";
+            lmc.gui.run.disabled = lmc.gui.walk.disabled = lmc.gui.step.disabled = lmc.gui.reload.disabled = true;
+        } else {
+            lmc.load(editArea.value);
+            editArea.replaceWith(codeArea);
+            btnLoad.textContent = "Edit";
+        }
+    });
+});
+</script>
+
+</body>
+</html>
