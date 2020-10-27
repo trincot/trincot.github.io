@@ -8,7 +8,7 @@
 </head>
 <body>
 
-<script src="https://cdn.jsdelivr.net/gh/trincot/lmc@v0.76/lmc.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/trincot/lmc@v0.77/lmc.js"></script>
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
@@ -24,14 +24,15 @@ document.addEventListener("DOMContentLoaded", function () {
     function toggle() {
         if (!editArea.parentNode) {
             lmc.load(); // stop execution
+            lmc.gui.run.disabled = lmc.gui.walk.disabled = lmc.gui.step.disabled = lmc.gui.reload.disabled = true;
             codeArea.replaceWith(editArea);
             editArea.focus();
             btnLoad.textContent = "Assemble";
-            lmc.gui.run.disabled = lmc.gui.walk.disabled = lmc.gui.step.disabled = lmc.gui.reload.disabled = true;
         } else {
-            lmc.load(editArea.value);
             editArea.replaceWith(codeArea);
             btnLoad.textContent = "Edit";
+            lmc.load(editArea.value);
+            lmc.gui.reload.disabled = false;
         }
     }
     toggle();
