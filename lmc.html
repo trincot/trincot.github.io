@@ -2,6 +2,7 @@
 <html>
 <head>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <title>Little Man Computer</title>
   <style>
     textarea { border: none; white-space: pre; min-width: 50% }
   </style>
@@ -16,14 +17,14 @@ document.addEventListener("DOMContentLoaded", function () {
     let urlParams = new URLSearchParams(location.search);
     let program;
     try {
-        program = atob(urlParams.get("code") || "");
+        program = decode(urlParams.get("code") || "");
     } catch(e) {}
     
     let lmc = new LmcGui(document.body);
     
     let btnLoad = document.createElement("button");    
     btnLoad.textContent = "Edit";
-    lmc.gui.reload.insertAdjacentElement("afterend", btnLoad);
+    lmc.gui.run.insertAdjacentElement("beforebegin", btnLoad);
     btnLoad.addEventListener("click", () => editArea.parentNode ? reload() : edit());
     
     // load program in text area
@@ -33,7 +34,20 @@ document.addEventListener("DOMContentLoaded", function () {
         editArea.value = program;
         assemble();
     } else {
-        editArea.value = "# Enter your LMC code here\n        HLT";
+        editArea.value = `; Enter your LMC code here. Then click Assemble and Run.
+; For the syntax, see Wikipedia on "Little Man Computer".
+; This demo takes two input values, and outputs the greatest of the two:
+          INP
+          STA first
+          INP
+          SUB first
+          BRP firstMost
+          LDA first 
+          BRA output
+firstMost ADD first
+output    OUT
+          HLT
+first     DAT`;
     }
 
     function edit() {
@@ -52,7 +66,15 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     
     function reload() {
-        location.href = location.href.split("?")[0] + "?code=" + (btoa(editArea.value) || "");
+        location.href = location.href.split("?")[0] + "?code=" + (encode(editArea.value) || "");
+    }
+    
+    function encode(s) {
+        return encodeURIComponent(s).replace(/%20/g, "+");
+    }
+    
+    function decode(s) {
+        return s;
     }
 });
 </script>
