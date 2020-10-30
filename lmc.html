@@ -3,39 +3,58 @@
 <head>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <style>
-    textarea { border: none; white-space: pre; min-width: 50% }    
+    textarea { border: none; white-space: pre; min-width: 50% }   
+    a { color: white }    
   </style>
 </head>
 <body>
 
-<script src="https://cdn.jsdelivr.net/gh/trincot/lmc@v0.77/lmc.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/trincot/lmc@v0.78/lmc.js"></script>
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
+    // Get URL parameter with base64 encoded program
+    let urlParams = new URLSearchParams(location.search);
+    let program;
+    try {
+        program = atob(urlParams.get("code"));
+    } catch(e) {}
+    
     let lmc = new LmcGui(document.body);
-    let codeArea = lmc.gui.code;
-    let editArea = document.createElement("textarea");
-    editArea.textContent = "        HLT";
+    
     let btnLoad = document.createElement("button");    
     btnLoad.textContent = "Edit";
     lmc.gui.reload.insertAdjacentElement("afterend", btnLoad);
-    btnLoad.addEventListener("click", toggle);
+    btnLoad.addEventListener("click", () => editArea.parentNode ? reload() : edit());
     
-    function toggle() {
-        if (!editArea.parentNode) {
-            lmc.load(); // stop execution
-            lmc.gui.run.disabled = lmc.gui.walk.disabled = lmc.gui.step.disabled = lmc.gui.reload.disabled = true;
-            codeArea.replaceWith(editArea);
-            editArea.focus();
-            btnLoad.textContent = "Assemble";
-        } else {
-            editArea.replaceWith(codeArea);
-            btnLoad.textContent = "Edit";
-            lmc.load(editArea.value);
-            lmc.gui.reload.disabled = false;
-        }
+    // load program in text area
+    let editArea = document.createElement("textarea");
+    edit();
+    if (program) {
+        editArea.value = program;
+        assemble();
+    } else {
+        editArea.value = "# Enter your LMC code here\n        HLT";
     }
-    toggle();
+
+    function edit() {
+        lmc.load(); // Stop execution
+        lmc.gui.run.disabled = lmc.gui.walk.disabled = lmc.gui.step.disabled = lmc.gui.totop.disabled = lmc.gui.reload.disabled = true;
+        lmc.gui.code.replaceWith(editArea);
+        editArea.focus();
+        btnLoad.textContent = "Assemble";
+    }
+    
+    function assemble() {
+        editArea.replaceWith(lmc.gui.code);
+        btnLoad.textContent = "Edit";
+        lmc.load(editArea.value);
+        lmc.gui.reload.disabled = false;
+    }
+    
+    function reload() {
+        location.href = location.href.split("?")[0] + "?code=" + btoa(editArea.value);
+    }
 });
 </script>
 
