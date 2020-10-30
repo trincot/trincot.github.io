@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", function () {
     let urlParams = new URLSearchParams(location.search);
     let program;
     try {
-        program = atob(urlParams.get("code"));
+        program = atob(urlParams.get("code") || "");
     } catch(e) {}
     
     let lmc = new LmcGui(document.body);
@@ -53,7 +53,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     
     function reload() {
-        location.href = location.href.split("?")[0] + "?code=" + btoa(editArea.value);
+        location.href = location.href.split("?")[0] + "?code=" + (btoa(editArea.value) || "");
     }
 });
 </script>
