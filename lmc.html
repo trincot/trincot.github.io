@@ -7,37 +7,39 @@
   <meta name="keywords" content="LMC,assembler,simulator,emulator,opcode,von neumann,stack overflow">
   <title>Little Man Computer - Trincot's online emulator</title>
   <style>
-    textarea { border: none; white-space: pre; min-width: 50% }
   </style>
 </head>
 <body>
 
-<script src="https://cdn.jsdelivr.net/gh/trincot/lmc@v0.80/lmc.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/trincot/lmc@v0.811/lmc.js"></script>
 
 <script>
+
 document.addEventListener("DOMContentLoaded", function () {
     // Get URL parameter with base64 encoded program
     let urlParams = new URLSearchParams(location.search);
-    let program;
+    let program, action, input;
     try {
         program = decode(urlParams.get("code") || "");
+        action = parseInt(urlParams.get("action"));
+        input = urlParams.get("input")
     } catch(e) {}
-    
-    let lmc = new LmcGui(document.body);
-    
-    let btnLoad = document.createElement("button");    
-    btnLoad.textContent = "Edit";
-    lmc.gui.run.insertAdjacentElement("beforebegin", btnLoad);
-    btnLoad.addEventListener("click", () => editArea.parentNode ? reload() : edit());
+
+    let lmc = new LmcGui(document.body, {
+        onStateChange(fromState, toState) {
+            if (lmc.editor.dirty && fromState === LmcGui.EDITING) {
+                location.href = location.href.split("?")[0] + urlSetParams({
+                    code: lmc.editor.text(),
+                    action: lmc.delay,
+                    input: lmc.gui.input.value
+                });
+            }
+        }
+    });
+    lmc.gui.input.value = input;
     
     // load program in text area
-    let editArea = document.createElement("textarea");
-    edit();
-    if (program) {
-        editArea.value = program;
-        assemble();
-    } else {
-        editArea.value = `; Enter your LMC code here. Then click Assemble and Run.
+    program = program || `; Enter your LMC code here. Then click Assemble and Run.
 ; For the syntax, see Wikipedia on "Little Man Computer".
 ; This demo takes two input values, and outputs the greatest of the two:
           INP
@@ -51,33 +53,19 @@ firstMost ADD first
 output    OUT
           HLT
 first     DAT`;
-    }
-
-    function edit() {
-        lmc.load(); // Stop execution
-        lmc.gui.run.disabled = lmc.gui.walk.disabled = lmc.gui.step.disabled = lmc.gui.totop.disabled = lmc.gui.reload.disabled = true;
-        lmc.gui.code.replaceWith(editArea);
-        editArea.focus();
-        btnLoad.textContent = "Assemble";
-    }
-    
-    function assemble() {
-        editArea.replaceWith(lmc.gui.code);
-        btnLoad.textContent = "Edit";
-        lmc.load(editArea.value);
-        lmc.gui.reload.disabled = false;
-    }
-    
-    function reload() {
-        location.href = location.href.split("?")[0] + "?code=" + (encode(editArea.value) || "");
-    }
+    lmc.load(program);
+    if (!isNaN(action)) lmc.run(action);
     
     function encode(s) {
-        return encodeURIComponent(s).replace(/%20/g, "+");
+        return encodeURIComponent(s).replace(/%20/g, "+") || "";
     }
     
     function decode(s) {
         return s;
+    }
+    
+    function urlSetParams(obj) {
+        return "?" + Object.entries(obj).map(([k, v]) => `${k}=${encode(v)}`).join("&");
     }
 });
 </script>

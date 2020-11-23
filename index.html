@@ -42,49 +42,56 @@
 <li><a href="https://stackoverflow.com/a/64587801/5459839">Buble sort (first input is array size)</a></li>
 </ul>
 
+
+<style>
+.red { background: red }
+.orange { background: orange }
+</style>
+
 <h4>Other Emulators</h4>
 <table>
 <tr><th>Feature</th><th>Trincot's</th><th>www.101computing.net/LMC/</th><th>peterhigginson.co.uk/lmc/</th></tr>
 <tr><td>Assembler syntax</td><td>STA + OTC</td><td>STA</td><td>STA + OTC</td></tr>
-<tr><td>Assembles into 3-digit numbers</td><td>yes</td><td>no, middle zero is omited! LDA 1 becomes 51 instead of 501. It executes correctly, but it is problematic for self modifying code</td><td>yes</td></tr>
-<tr><td>Comment start character</td><td>Any non-alphanumerical</td><td>not supported</td><td>slash /</td></tr>
+<tr><td>Assembles into 3-digit numbers</td><td>yes</td><td class="red">no, middle zero is omited! LDA 1 becomes 51 instead of 501. It executes correctly, but it is problematic for self modifying code</td><td>yes</td></tr>
+<tr><td>Comment start character</td><td>Any non-alphanumerical</td><td class="red">not supported</td><td>slash /</td></tr>
 <tr><td>Labels case sensitive</td><td>no</td><td>no</td><td>yes</td></tr>
-<tr><td>Rejects unresolved labels</td><td>yes</td><td>no, the label name gets stored in the mailbox</td><td>yes</td></tr>
+<tr><td>Rejects unresolved labels</td><td>yes</td><td class="red">no, the label name gets stored in the mailbox</td><td>yes</td></tr>
 <tr><td>Rejects mnemonics as labels</td><td>yes</td><td>yes</td><td>yes</td></tr>
 <tr><td>Can use mailbox numbers</td><td>yes</td><td>yes</td><td>yes</td></tr>
-<tr><td>Rejects numerical labels</td><td>yes</td><td>no, overrides mailbox number</td><td>no, ignores them</td></tr>
+<tr><td>Rejects numerical labels</td><td>yes</td><td class="red">no, overrides mailbox number</td><td>no, ignores them</td></tr>
 
-<tr><td>DAT range</td><td>{0,...,999}</td><td>any string</td><td>any decimal number</td></tr>
+<tr><td>DAT range</td><td>{0,...,999}</td><td class="red">any string</td><td class="red">any decimal number</td></tr>
 <tr><td>DAT parses hexadecimal</td><td>no</td><td>no</td><td>yes</td></tr>
 <tr><td>DAT parses binary</td><td>no</td><td>no</td><td>yes</td></tr>
 <tr><td>DAT parses scientific notation</td><td>no</td><td>no</td><td>yes</td></tr>
 <tr><td>DAT parses label reference</td><td>yes</td><td>no</td><td>yes</td></tr>
-<tr><td>DAT forbids decimals</td><td>yes</td><td>no</td><td>no</td></tr>
-<tr><td>DAT forbids non-numerical</td><td>yes</td><td>no</td><td>yes</td></tr>
+<tr><td>DAT forbids decimals</td><td>yes</td><td class="red">no</td class="red"><td>no</td></tr>
+<tr><td>DAT forbids non-numerical</td><td>yes</td><td class="red">no</td><td>yes</td></tr>
 <tr><td>DAT default value</td><td>0</td><td>0</td><td>0</td></tr>
-<tr><td>DAT without label definition</td><td>yes</td><td>no</td><td>yes</td></tr>
+<tr><td>DAT without label definition</td><td>yes</td><td class="red">no</td><td>yes</td></tr>
 <tr><td>DAT is optional</td><td>yes</td><td>no</td><td>no</td></tr>
+<tr><td>DAT without value, with comment</td><td>yes</td><td>no</td><td class="red">no</td></tr>
 
-<tr><td>INP range</td><td>{0,...,999}</td><td>any string</td><td>{-999,...,999}</td></tr>
+<tr><td>INP range</td><td>{0,...,999}</td><td class="red">any string</td><td>{-999,...,999}</td></tr>
 <tr><td>INP parses hexadecimal</td><td>no</td><td>no, but calculation does</td><td>yes</td></tr>
 <tr><td>INP parses binary</td><td>no</td><td>no</td><td>yes</td></tr>
 <tr><td>INP parses scientific notation</td><td>no</td><td>no</td><td>yes, but only loads part before E</td></tr>
 <tr><td>INP parses label reference</td><td>no</td><td>no</td><td>no</td></tr>
-<tr><td>INP forbids decimals</td><td>yes, non-digit is taken as delimeter</td><td>no</td><td>yes, it ignores them</td></tr>
+<tr><td>INP forbids decimals</td><td>yes, non-digit is taken as delimeter</td><td class="red">no</td><td>yes, it ignores them</td></tr>
 
-<tr><td>BRA without argument is error</td><td>yes</td><td>no, execution stops</td><td>no, default mailbox is 0</td></tr>
-<tr><td>INP with argument is error</td><td>yes</td><td>no, is appended to opcode</td><td>no, is ignored</td></tr>
+<tr><td>BRA without argument is error</td><td>yes</td><td>no, execution stops</td><td class="red">no, default mailbox is 0</td></tr>
+<tr><td>INP with argument is error</td><td>yes</td><td class="red">no, is appended to opcode</td><td>no, is ignored</td></tr>
 
-<tr><td>Accumulator after LDA</td><td>{0,...,999}</td><td>result of parseInt: floating point, NaN, Infinity</td><td>[-999.0, 1000.0) - Hangs when reading really BIG numbers with 300 digits</td></tr>
-<tr><td>Accumulator after INP</td><td>{0,...,999}</td><td>exact copy (string)</td><td>{-999,...,999}</td></tr>
+<tr><td>Accumulator after LDA</td><td>{0,...,999}</td><td class="red">result of parseInt: floating point, NaN, Infinity</td><td class="red">[-999.0, 1000.0) - Hangs when reading really BIG numbers with 300 digits</td></tr>
+<tr><td>Accumulator after INP</td><td>{0,...,999}</td><td class="red">exact copy (string)</td><td>{-999,...,999}</td></tr>
 
-<tr><td>99: LDA 0 behaviour</td><td>error on mailbox 99</td><td>continues to 100 and remains in executing state</td><td>continues to 100 and stops in fast mode, but in non-fast mode will continue to 101, 102, ... reading undefined</td></tr>
-<tr><td>99: BRA 0 works</td><td>yes</td><td>yes</td><td>yes, but have to encode the BRA instruction inside the mailbox</td></tr>
-<tr><td>Loading too large program is rejected</td><td>yes</td><td>no, execution remains at PC=100</td><td>yes, clipped at 98, and mailbox 99 is always 0</td></tr>
+<tr><td>99: LDA 0 behaviour</td><td>error on mailbox 99</td><td class="red">continues to 100 and remains in executing state</td><td class="red">continues to 100 and stops in fast mode, but in non-fast mode will continue to 101, 102, ... reading undefined</td></tr>
+<tr><td>99: BRA 0 works</td><td>yes</td><td>yes</td><td class="orange">yes, but have to encode the BRA instruction inside the mailbox</td></tr>
+<tr><td>Loading too large program is rejected</td><td>yes</td><td class="red">no, execution remains at PC=100</td><td>yes, clipped at 98, and mailbox 99 is always 0</td></tr>
 
 <tr><td>BRP branches when</td><td>flag is not set</td><td>accumulator is not negative and not NaN</td><td>accumulator is not negative</td></tr>
 <tr><td>BRZ branches when</td><td>accumulator is zero and flag is not set</td><td>accumulator is zero</td><td>accumulator is zero</td></tr>
-<tr><td>0xx is executed as HLT</td><td>yes</td><td>no, left-most digit is taken as opcode</td><td>yes</td></tr>
+<tr><td>0xx is executed as HLT</td><td>yes</td><td class="red">no, left-most digit is taken as opcode</td><td>yes</td></tr>
 <tr><td>4xx is an error</td><td>yes</td><td>no-op</td><td>yes</td></tr>
 <tr><td>999 is an error</td><td>yes</td><td>no-op</td><td>yes</td></tr>
 <tr><td>Can run Sort program</td><td>yes</td><td>yes</td><td>yes</td></tr>
