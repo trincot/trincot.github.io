@@ -11,7 +11,8 @@
 </head>
 <body>
 
-<script src="https://cdn.jsdelivr.net/gh/trincot/lmc@v0.812/lmc.js"></script>
+<script _src="https://cdn.jsdelivr.net/gh/trincot/lmc@v0.812/lmc.js"></script>
+<script src="../lmc/lmc.js"></script>
 
 <script>
  
@@ -39,7 +40,7 @@ document.addEventListener("DOMContentLoaded", function () {
     lmc.gui.input.value = input;
     
     // load program in text area
-    program = program || `; Enter your LMC code here. Then click Assemble and Run.
+    program = program || `; Enter your LMC code here. Then click Run.
 ; For the syntax, see Wikipedia on "Little Man Computer".
 ; This demo takes two input values, and outputs the greatest of the two:
           INP
