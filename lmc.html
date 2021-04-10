@@ -7,11 +7,18 @@
   <meta name="keywords" content="LMC,assembler,simulator,emulator,opcode,von neumann,stack overflow">
   <title>Little Man Computer - Trincot's online emulator</title>
   <style>
+    #trincot a[href] { color: orange }
+    #trincot {
+        margin-top: auto;
+        font-style: italic;
+        font-size: small;
+        text-align: right;
+    }
   </style>
 </head>
 <body>
 
-<script src="https://cdn.jsdelivr.net/gh/trincot/lmc@v0.815/lmc.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/trincot/lmc@v0.816/lmc.js"></script>
 
 <script>
  
@@ -38,7 +45,10 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
     lmc.gui.input.value = input;
-    
+    // Add reference to trinctot's profile
+    document.querySelector(".lmc>div:last-child").insertAdjacentHTML("beforeend",
+        '<div id="trincot">provided by <a href="https://stackoverflow.com/users/5459839/trincot">trincot</a></div>'
+    );
     // load program in text area
     program = program || `; Enter your LMC code here. Then click Run.
 ; For the syntax, see Wikipedia on "Little Man Computer".
