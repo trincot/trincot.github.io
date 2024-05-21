@@ -1,5 +1,4 @@
-{ 
-	"outlook": [
+[
 	{
 		"year": "2010/2011 ",
 		"Area (1000 ha)": 526.1,
@@ -308,4 +307,4 @@
 		"per capita consumption (kg) - processed": 8.4,
 		"Self-sufficiency rate (processed) %": 111.2
 	}
-]}
+]
