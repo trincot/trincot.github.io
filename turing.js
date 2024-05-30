@@ -42,7 +42,7 @@ class Presentation {
     constructor() {
         document.body.innerHTML = `
 <style>
-    td { border: 1px solid; padding: 5px; }
+    td { border: 1px solid; padding: 5px; font-family: monospace }
     .selected { background: lightgreen }
 </style>
 Input: <input><button>Load<\/button><br>
