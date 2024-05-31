@@ -8,17 +8,17 @@ class Turing {
             }
         }
         this.initState = initState;
-        this.onChange = () => null;
     }    
     load(tape) {
         this.tape = ["_", ...tape, "_"];
         this.state = this.initState;
         this.index = 1;
-        this.onChange();
+        this.count = 0;
     }
     step() {
         const transaction = this.transaction();
-        if (!transaction) return;
+        if (!transaction) return false;
+        this.count++;
         const {write, nextState, move} = transaction;
         if (write) this.tape[this.index] = write;
         this.state = nextState;
@@ -28,7 +28,7 @@ class Turing {
             this.tape.unshift("_");
             this.index++;
         }
-        this.onChange();
+        return true;
     }
     transaction() {
         return this.states[this.state]?.[this.tape[this.index] ?? "_"];
@@ -49,9 +49,10 @@ Input: <input><button>Load<\/button><br>
 Tape:
 <table><tr><\/tr><\/table>
 State: <span><\/span><br>
+Count: <span><\/span><br>
 <button>Step<\/button><button>Play<\/button>
         `;
-        [this.input, this.output, this.stateOut] = document.querySelectorAll("input,tr,span");
+        [this.input, this.output, this.stateOut, this.counter] = document.querySelectorAll("input,tr,span");
         [this.load, this.step, this.play] = document.querySelectorAll("button");
         this.timer = -1;
     }
@@ -60,10 +61,11 @@ State: <span><\/span><br>
         this.output.innerHTML = Array.from(turing.tape, (chr, i) => 
             `<td ${i === turing.index ? "class=selected" : ""}>${chr}<\/td>`
         ).join("");
+        this.counter.textContent = turing.count;
     }
 }
 
-function createTuring({transitions, initState, tape}) {
+function createTuring({transitions, initState, tape, tests}) {
     const turing = new Turing(transitions, initState);
     const view = new Presentation();
     view.load.onclick = () => {
@@ -85,4 +87,14 @@ function createTuring({transitions, initState, tape}) {
     };
     view.input.value = tape;
     view.load.onclick();
+    let obj = {};
+    for (const [tape, expected] of tests ?? []) {
+        turing.load(tape);
+        for (let i = 0; i < 10000; i++) { // Avoid infinite loop
+            obj[turing.state + "_" + turing.tape[turing.index]] = 1;
+            if (!turing.step()) break;
+        }
+        console.assert(turing.state === expected, `failed test: ${tape}`);
+    }
+    console.log(JSON.stringify(obj, null, 2));
 }
