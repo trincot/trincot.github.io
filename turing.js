@@ -87,14 +87,11 @@ function createTuring({transitions, initState, tape, tests}) {
     };
     view.input.value = tape;
     view.load.onclick();
-    let obj = {};
     for (const [tape, expected] of tests ?? []) {
         turing.load(tape);
         for (let i = 0; i < 10000; i++) { // Avoid infinite loop
-            obj[turing.state + "_" + turing.tape[turing.index]] = 1;
             if (!turing.step()) break;
         }
         console.assert(turing.state === expected, `failed test: ${tape}`);
     }
-    console.log(JSON.stringify(obj, null, 2));
 }
