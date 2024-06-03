@@ -14,6 +14,7 @@ class Turing {
         this.state = this.initState;
         this.index = 1;
         this.count = 0;
+        this.tape[this.index + 1] ??= "_"; 
     }
     step() {
         const transaction = this.transaction();
@@ -85,8 +86,6 @@ function createTuring({transitions, initState, tape, tests}) {
             view.play.onclick();
         }, 100);
     };
-    view.input.value = tape;
-    view.load.onclick();
     for (const [tape, expected] of tests ?? []) {
         turing.load(tape);
         for (let i = 0; i < 10000; i++) { // Avoid infinite loop
@@ -94,4 +93,6 @@ function createTuring({transitions, initState, tape, tests}) {
         }
         console.assert(turing.state === expected, `failed test: ${tape}`);
     }
+    view.input.value = tape;
+    view.load.onclick();
 }
