@@ -9,12 +9,13 @@ class Turing {
         }
         this.initState = initState;
     }    
-    load(tape) {
-        this.tape = ["_", ...tape, "_"];
+    load(tape, shift=1, size=2) {
+        tape = tape || "_",
+        this.tape = [...("_".repeat(shift) + tape).padEnd(size, "_")];
         this.state = this.initState;
-        this.index = 1;
+        this.index = shift;
         this.count = 0;
-        this.tape[this.index + 1] ??= "_"; 
+        this.unshiftCount = shift;
     }
     step() {
         const transaction = this.transaction();
@@ -28,14 +29,24 @@ class Turing {
         if (!this.index) {
             this.tape.unshift("_");
             this.index++;
+            this.unshiftCount++;
         }
         return true;
+    }
+    run() {
+        for (let i = 0; true; i++) { // Avoid infinite loop
+            if (!this.step()) break;
+            if (i >= 1e6) throw "Too much work for the Turing Machine";
+        }
     }
     transaction() {
         return this.states[this.state]?.[this.tape[this.index] ?? "_"];
     }
     accepted() {
         this.state === "accept";
+    }
+    output() {
+        return this.tape.join("").replace(/_+$|^_+/g, "");
     }
 }
 
@@ -72,6 +83,8 @@ function createTuring({transitions, initState, tape, tests}) {
     view.load.onclick = () => {
         clearTimeout(view.timer);
         turing.load(view.input.value);
+        turing.run(); // Dry run of input
+        turing.load(view.input.value, turing.unshiftCount, turing.tape.length);
         view.display(turing);
     };
     view.step.onclick = () => {
@@ -86,13 +99,11 @@ function createTuring({transitions, initState, tape, tests}) {
             view.play.onclick();
         }, 100);
     };
+    view.input.value = tape;
     for (const [tape, expected] of tests ?? []) {
         turing.load(tape);
-        for (let i = 0; i < 10000; i++) { // Avoid infinite loop
-            if (!turing.step()) break;
-        }
-        console.assert(turing.state === expected, `failed test: ${tape}`);
+        turing.run();
+        console.assert([turing.state, turing.output()].includes(expected), `failed test: ${tape}. Expected ${expected}, got state=${turing.state}, output=${turing.output()}`);
     }
-    view.input.value = tape;
     view.load.onclick();
 }
