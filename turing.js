@@ -36,7 +36,10 @@ class Turing {
     run() {
         for (let i = 0; true; i++) { // Avoid infinite loop
             if (!this.step()) break;
-            if (i >= 1e6) throw "Too much work for the Turing Machine";
+            if (i >= 1e6) {
+                console.log("Too much work for the Turing Machine");
+                break;
+            }
         }
     }
     transaction() {
