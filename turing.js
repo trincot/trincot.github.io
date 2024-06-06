@@ -4,7 +4,7 @@ class Turing {
         for (const {state, read, write, move, nextState} of transitions) {
             const obj = this.states[state] ??= {};
             for (const chr of read) {
-                obj[chr] = { write, move: move === "R" ? 1 : -1, nextState };
+                obj[chr] = { write, move: "L R".indexOf(move ?? " ") - 1, nextState };
             }
         }
         this.initState = initState;
@@ -37,7 +37,7 @@ class Turing {
         for (let i = 0; true; i++) { // Avoid infinite loop
             if (!this.step()) break;
             if (i >= 1e6) {
-                console.log("Too much work for the Turing Machine");
+                // Too much work for the Turing Machine: give up
                 break;
             }
         }
@@ -71,16 +71,17 @@ Count: <span><\/span><br>
         [this.load, this.step, this.play] = document.querySelectorAll("button");
         this.timer = -1;
     }
-    display(turing) {
+    display(turing, logState) {
         this.stateOut.textContent = turing.state;
         this.output.innerHTML = Array.from(turing.tape, (chr, i) => 
             `<td ${i === turing.index ? "class=selected" : ""}>${chr}<\/td>`
         ).join("");
         this.counter.textContent = turing.count;
+        if (turing.state === logState) console.log(turing.output());
     }
 }
 
-function createTuring({transitions, initState, tape, tests}) {
+function createTuring({transitions, initState, tape, tests, logState}) {
     const turing = new Turing(transitions, initState);
     const view = new Presentation();
     view.load.onclick = () => {
@@ -93,7 +94,7 @@ function createTuring({transitions, initState, tape, tests}) {
     view.step.onclick = () => {
         clearTimeout(view.timer);
         turing.step();
-        view.display(turing);
+        view.display(turing, logState);
     };
     view.play.onclick = () => {
         clearTimeout(view.timer);
