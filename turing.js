@@ -59,6 +59,8 @@ class Presentation {
 <style>
     td { border: 1px solid; padding: 5px; font-family: monospace }
     .selected { background: lightgreen }
+    .highlight { background: yellow }
+    .highlight.selected { background: gold }
 </style>
 Input: <input><button>Load<\/button><br>
 Tape:
@@ -74,10 +76,10 @@ Count: <span><\/span><br>
     display(turing, logState) {
         this.stateOut.textContent = turing.state;
         this.output.innerHTML = Array.from(turing.tape, (chr, i) => 
-            `<td ${i === turing.index ? "class=selected" : ""}>${chr}<\/td>`
+            `<td class="${turing.state === logState && chr != "_" ? "highlight " : ""
+                      } ${i === turing.index ? "selected" : ""}">${chr}<\/td>`
         ).join("");
         this.counter.textContent = turing.count;
-        if (turing.state === logState) console.log(turing.output());
     }
 }
 
@@ -101,7 +103,7 @@ function createTuring({transitions, initState, tape, tests, logState}) {
         view.timer = setTimeout(() => {
             view.step.onclick();
             view.play.onclick();
-        }, 100);
+        }, turing.state === logState ? 500 : 100);
     };
     view.input.value = tape;
     for (const [tape, expected] of tests ?? []) {
