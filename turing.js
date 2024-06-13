@@ -93,7 +93,8 @@ class Presentation {
         document.body.innerHTML = `
 <style>
     td { border: 1px solid; padding: 5px; font-family: monospace }
-    .selected { background: lightgreen }
+    .selected, .blank.selected { background: lightgreen }
+    .blank { background: #eee }
     .highlight { background: yellow }
     .highlight.selected { background: gold }
 </style>
@@ -111,8 +112,9 @@ Count: <span><\/span><br>
     display(turing, logState) {
         this.stateOut.textContent = turing.state;
         this.output.innerHTML = Array.from(turing.tape, (chr, i) => 
-            `<td class="${turing.state === logState && chr != this.blank ? "highlight " : ""
-                      } ${i === turing.index ? "selected" : ""}">${chr}<\/td>`
+            `<td class="${turing.state === logState && chr != turing.blank ? "highlight " : ""
+                         } ${i === turing.index ? "selected " : ""
+                         } ${chr === turing.blank ? "blank " : ""}">${chr}<\/td>`
         ).join("");
         this.counter.textContent = turing.count;
     }
