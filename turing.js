@@ -1,33 +1,36 @@
 class Turing {
-    constructor(transitions, initState) {
+    constructor(transitions, initState, blank="_") {
         this.states = {}; // Load transition table in dictionary
         for (const {state, read, write, move, nextState} of transitions) {
             const obj = this.states[state] ??= {};
             for (const chr of read) {
-                obj[chr] = { write, move: "L R".indexOf(move ?? " ") - 1, nextState };
+                obj[chr] = { write, move: "L R".indexOf(move ?? " ") - 1, nextState, count: 0 };
             }
         }
         this.initState = initState;
+        this.markdown = Turing.markdown(transitions);
+        this.blank = blank
     }    
     load(tape, shift=1, size=2) {
-        tape = tape || "_",
-        this.tape = [...("_".repeat(shift) + tape).padEnd(size, "_")];
+        tape = tape || this.blank,
+        this.tape = [...(this.blank.repeat(shift) + tape).padEnd(size, this.blank)];
         this.state = this.initState;
         this.index = shift;
         this.count = 0;
         this.unshiftCount = shift;
     }
     step() {
-        const transaction = this.transaction();
-        if (!transaction) return false;
+        const transition = this.transition();
+        if (!transition) return false;
+        transition.count++;
         this.count++;
-        const {write, nextState, move} = transaction;
+        const {write, nextState, move} = transition;
         if (write) this.tape[this.index] = write;
         this.state = nextState;
         this.index += move;
-        this.tape[this.index + 1] ??= "_";
+        this.tape[this.index + 1] ??= this.blank;
         if (!this.index) {
-            this.tape.unshift("_");
+            this.tape.unshift(this.blank);
             this.index++;
             this.unshiftCount++;
         }
@@ -36,20 +39,52 @@ class Turing {
     run() {
         for (let i = 0; true; i++) { // Avoid infinite loop
             if (!this.step()) break;
-            if (i >= 1e6) {
+            if (i >= 1000) {
                 // Too much work for the Turing Machine: give up
                 break;
             }
         }
     }
-    transaction() {
-        return this.states[this.state]?.[this.tape[this.index] ?? "_"];
+    transition() {
+        return this.states[this.state]?.[this.tape[this.index] ?? this.blank];
     }
     accepted() {
         this.state === "accept";
     }
+    halted() {
+        return !this.transition();
+    }
     output() {
-        return this.tape.join("").replace(/_+$|^_+/g, "");
+        let s = this.tape.join("");
+        while (s[0] === this.blank) s = s.slice(1);
+        while (s.at(-1) === this.blank) s = s.slice(0, -1);
+        return s;
+    }
+    unusedTransitions() {
+        return Object.entries(this.states).flatMap(([state, reads]) =>
+            Object.entries(reads).map(([read, {write, move, nextState, count}]) =>
+                !count && ({state, read, write, move, nextState})
+            )
+        ).filter(Boolean);
+    }
+    static markdown(transitions) {
+        const matrix = [
+            ["state", "read", "write", "move head", "next state"],
+            Array(5).fill(":--:"),
+            ...transitions.map(({state, read, write, move, nextState}) => [
+                state, 
+                read.replace(/(?!^)(?=..)/g, ", ").replace(/(?!^)(?=.$)/, " or "),  
+                write ?? "", 
+                ({L:"left", R:"right"})[move] ?? "", 
+                nextState
+            ])
+        ];
+        const widths = matrix.reduce((widths, row) =>
+            widths.map((width, i) => Math.max(width, row[i].length))
+        , Array(5).fill(0));
+        return matrix.map(row =>
+            row.map((item, i) => " | " + item.padEnd(widths[i])).join("").trim()
+        ).join("\n");
     }
 }
 
@@ -76,15 +111,15 @@ Count: <span><\/span><br>
     display(turing, logState) {
         this.stateOut.textContent = turing.state;
         this.output.innerHTML = Array.from(turing.tape, (chr, i) => 
-            `<td class="${turing.state === logState && chr != "_" ? "highlight " : ""
+            `<td class="${turing.state === logState && chr != this.blank ? "highlight " : ""
                       } ${i === turing.index ? "selected" : ""}">${chr}<\/td>`
         ).join("");
         this.counter.textContent = turing.count;
     }
 }
 
-function createTuring({transitions, initState, tape, tests, logState}) {
-    const turing = new Turing(transitions, initState);
+function createTuring({transitions, initState, blank, tape, tests, logState}) {
+    const turing = new Turing(transitions, initState, blank ?? "_");
     const view = new Presentation();
     view.load.onclick = () => {
         clearTimeout(view.timer);
@@ -112,4 +147,7 @@ function createTuring({transitions, initState, tape, tests, logState}) {
         console.assert([turing.state, turing.output()].includes(expected), `failed test: ${tape}. Expected ${expected}, got state=${turing.state}, output=${turing.output()}`);
     }
     view.load.onclick();
+    return turing.markdown + "\n\nUnused transitions:\n" 
+         + JSON.stringify(turing.unusedTransitions(), null, 2);
 }
+
