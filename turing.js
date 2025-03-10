@@ -9,7 +9,7 @@ class Turing {
         }
         this.initState = initState;
         this.markdown = Turing.markdown(transitions);
-        this.blank = blank
+        this.blank = blank;
     }    
     load(tape, shift=1, size=2) {
         tape = tape || this.blank,
@@ -36,13 +36,9 @@ class Turing {
         }
         return true;
     }
-    run() {
-        for (let i = 0; true; i++) { // Avoid infinite loop
+    run(stepLimit=1000) {
+        for (let i = 0; i < stepLimit; i++) { // Avoid infinite loop
             if (!this.step()) break;
-            if (i >= 1000) {
-                // Too much work for the Turing Machine: give up
-                break;
-            }
         }
     }
     transition() {
@@ -120,13 +116,13 @@ Count: <span><\/span><br>
     }
 }
 
-function createTuring({transitions, initState, blank, tape, tests, logState}) {
+function createTuring({transitions, initState, blank, tape, tests, logState, stepLimit=10000}) {
     const turing = new Turing(transitions, initState, blank ?? "_");
     const view = new Presentation();
     view.load.onclick = () => {
         clearTimeout(view.timer);
         turing.load(view.input.value);
-        turing.run(); // Dry run of input
+        turing.run(stepLimit); // Dry run of input
         turing.load(view.input.value, turing.unshiftCount, turing.tape.length);
         view.display(turing);
     };
@@ -145,7 +141,7 @@ function createTuring({transitions, initState, blank, tape, tests, logState}) {
     view.input.value = tape;
     for (const [tape, expected] of tests ?? []) {
         turing.load(tape);
-        turing.run();
+        turing.run(stepLimit);
         console.assert([turing.state, turing.output()].includes(expected), `failed test: ${tape}. Expected ${expected}, got state=${turing.state}, output=${turing.output()}`);
     }
     view.load.onclick();
