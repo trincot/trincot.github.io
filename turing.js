@@ -167,7 +167,6 @@ function createTuring({transitions, initState, blank, tape, tests, logState, ste
     for (const [tape, expected] of tests ?? []) {
         turing.load(tape);
         turing.run(stepLimit);
-        console.log(tape.length, turing.count);
         console.assert([turing.state, turing.output()].includes(expected), `failed test: ${tape}. Expected ${expected}, got state=${turing.state}, output=${turing.output()}`);
     }
     view.load.onclick();
